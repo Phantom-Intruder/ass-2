@@ -4,11 +4,7 @@ $menu_item_default = 'index';
 $menu_items = array(
   'index' => array(
     'label' => 'Home',
-    'desc' => 'A list of all categories',
-  ),
-  'Cart/Show' => array(
-    'label' => 'Show Cart',
-    'desc' => 'Show contents of cart',
+    'desc' => 'View the wish list',
   ),
 );
 
@@ -43,6 +39,10 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
         <?= link_tag(base_url().'/css/main.css'); ?>
 
         <script src=<?= base_url()."/js/vendor/modernizr-2.6.2.min.js"?>></script>
+        <script src=<?= base_url()."/js/vendor/jquery-1.9.1.min.js"?>></script>
+        <script src=<?= base_url()."/js/vendor/underscore-min.js"?>></script>
+        <script src=<?= base_url()."/js/vendor/backbone-min.js"?>></script>
+
     </head>
     <body>
         <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
@@ -50,7 +50,7 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="#">Book Store</a>
+                    <a class="brand" href="#">Wish List</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                           <?php
