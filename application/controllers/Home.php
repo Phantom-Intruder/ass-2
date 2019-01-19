@@ -5,47 +5,63 @@ class Home extends CI_Controller
 {
 
     /**
-     * Index Page for Home controller.
+     * Shows login page to user if not logged in.
      */
     public function login()
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
         if (!isset($this->session->userLoggedIn)) {
-            $this->load->helper('form');
-            $this->load->library('form_validation');
-            $this->form_validation->set_rules(array(
-                array(
-                    'field' => 'userName',
-                    'label' => 'Username',
-                    'rules' => 'required',
-                ),
-                array(
-                    'field' => 'password',
-                    'label' => 'Password',
-                    'rules' => 'required',
-                )
-            ));
-            $this->form_validation->set_error_delimiters('<div class="alert alert-error">', '</div>');
-            if (!$this->form_validation->run()) {
-                $this->load->view('Home/Login');
-            }else{
-                $this->load->model('User');
-                $user = new User();
-                $user->userName = $this->input->post('userName');
-                $user->password = $this->input->post('password');
-                if ($user->login()){
-                    //success
-                }else{
-                    //retry
-                    $this->load->view('Home/Login');
-                }
-            }
+            $this->load->view('Home/Login');
         }else{
             $this->load->view('Home/AlreadyLoggedIn');
-            die();
+        }
+        $this->load->view('Navigation/UserNavigation/footer');
+    }
+
+    /**
+     * Checks user login
+     */
+    public function checkLogin(){
+        header('Content-type: application/json');
+        $username = $this->uri->segment(3);
+        $password = $this->uri->segment(4);
+        $this->load->model('User');
+        $user = $this->User->getUserFromLogin($username, $password);
+        if (isset($user)){
+            $this->session->userLoggedIn = $user;
+        }else{
+            print json_encode("Wrong pass");
         }
     }
+
+    /**
+     * Shows register page to user if not registered.
+     */
+    public function register()
+    {
+        $this->load->view('Navigation/UserNavigation/Header');
+        //if user not logged in,
+        if (!isset($this->session->userLoggedIn)) {
+            $this->load->view('Home/Register');
+        }else{
+            $this->load->view('Home/AlreadyLoggedIn');
+        }
+        $this->load->view('Navigation/UserNavigation/footer');
+    }
+
+    /**
+     * Logout a user
+     */
+    public function logout(){
+        header('Content-type: application/json');
+        if (isset($this->session->userLoggedIn )){
+            $this->session->userLoggedIn = null;
+        }else{
+            print json_encode("Not logged in");
+        }
+    }
+
 
     /**
      * Show editable list to user.
@@ -54,11 +70,15 @@ class Home extends CI_Controller
     {
         //Get user from session
         if (isset($this->session->userLoggedIn)) {
+            $this->load->view('Navigation/UserNavigation/header');
             //Load user data from model
             $this->load->model('WishList');
-            $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn);
+            $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn->id);
             //return View
-            print json_encode($wishList);
+            $this->load->view('Home/List', array(
+                'wishList' => $wishList,
+            ));
+            $this->load->view('Navigation/UserNavigation/footer');
         }else{
             //If no user, then redirect to login page
             redirect('/Home/Login', 'refresh');
@@ -71,33 +91,64 @@ class Home extends CI_Controller
      */
     public function showListViewable($listId)
     {
+        $this->load->view('Navigation/UserNavigation/header');
         //Get list data from model
         $this->load->model('WishList');
+        $wishList = new WishList();
+        $wishList->load($listId);
         $wishList = $this->WishList->getFromListId($listId);
         //return View
+        $this->load->view('Home/List', array(
+            'wishList' => $wishList,
+        ));
+        $this->load->view('Navigation/UserNavigation/footer');
     }
 
     /**
      * Show add form for item .
-     * @param int $listId
+     * @param int $itemId
      */
-    public function addItem($listId)
+    public function showItemForm($itemId)
     {
         //If listId is set then:
+        if (isset($listId)){
             // Get data from model for listId
-            // Fill form view with data
-        //else
+            $this->load->model('Item');
+            $item = new Item();
+            $item->load($itemId);
+            $this->load->view('Home/Item/Show', array(
+                'item' => $item,
+            ));
+        }else{
             // show empty form
+            $this->load->view('Home/Item/Show');
+        }
         //insert or update model and db
     }
 
     /**
-     * Delete item from db and list.
-     * @param int $listId
+     * Add or update item
+     * @param item $item
      */
-    public function deleteItem($listId)
+    public function addOrUpdateItem($item)
+    {
+        $this->load->model('Item');
+        $changedItem = new Item();
+        $changedItem = $item;
+        $changedItem->save();
+    }
+
+    /**
+     * Delete item from db and list.
+     * @param int $itemId
+     */
+    public function deleteItem($itemId)
     {
         //check if item exists
+        $this->load->model('Item');
+        $item = new Item();
         //If yes then delete
+        $item->load($itemId);
+        $item->delete($itemId);
     }
 }
