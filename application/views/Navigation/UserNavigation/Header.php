@@ -42,6 +42,7 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
         <script src=<?= base_url()."/js/vendor/jquery-1.9.1.min.js"?>></script>
         <script src=<?= base_url()."/js/vendor/underscore-min.js"?>></script>
         <script src=<?= base_url()."/js/vendor/backbone-min.js"?>></script>
+        <script src=<?= base_url()."/js/vendor/backbone-forms.js"?>></script>
 
     </head>
     <body>
