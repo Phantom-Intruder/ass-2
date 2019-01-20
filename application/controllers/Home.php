@@ -43,11 +43,11 @@ class Home extends CI_Controller
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
         if (!isset($this->session->userLoggedIn)) {
-            $this->load->view('Home/Register');
+            $this->load->view('User/Register');
         }else{
-            $this->load->view('Home/AlreadyLoggedIn');
+            $this->load->view('User/AlreadyLoggedIn');
         }
-        $this->load->view('Navigation/UserNavigation/footer');
+        //$this->load->view('Navigation/UserNavigation/footer');
     }
 
     /**
