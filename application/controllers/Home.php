@@ -1,35 +1,34 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+require APPPATH . 'libraries/REST_Controller.php';
 
-class Home extends CI_Controller
+class Home extends REST_Controller
 {
 
     /**
      * Shows login page to user if not logged in.
      */
-    public function login()
+    public function login_get()
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
         if (!isset($this->session->userLoggedIn)) {
-            $this->load->view('Home/Login');
+            $this->load->view('User/Login');
         }else{
-            $this->load->view('Home/AlreadyLoggedIn');
+            redirect('/Home/List', 'refresh');
         }
-        $this->load->view('Navigation/UserNavigation/footer');
+        //$this->load->view('Navigation/UserNavigation/footer');
     }
 
     /**
      * Checks user login
      */
-    public function checkLogin(){
+    public function login_post(){
         header('Content-type: application/json');
-        $username = $this->uri->segment(3);
-        $password = $this->uri->segment(4);
         $this->load->model('User');
-        $user = $this->User->getUserFromLogin($username, $password);
+        $user = $this->User->getUserFromLogin($this->post('username'), $this->post('password'));
         if (isset($user)){
             $this->session->userLoggedIn = $user;
+            redirect('/List/Show', 'refresh');
         }else{
             print json_encode("Wrong pass");
         }
@@ -38,7 +37,7 @@ class Home extends CI_Controller
     /**
      * Shows register page to user if not registered.
      */
-    public function register()
+    public function register_get()
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
@@ -48,6 +47,38 @@ class Home extends CI_Controller
             $this->load->view('User/AlreadyLoggedIn');
         }
         //$this->load->view('Navigation/UserNavigation/footer');
+    }
+
+    /**
+     * Gets user and wish list data from register page
+     */
+    public function register_post(){
+        header('Content-type: application/json');
+        date_default_timezone_set('Asia/Colombo');
+
+        $this->load->model('User');
+        $user = new User();
+        $user->firstName = $this->post('firstName');
+        $user->username = $this->post('username');
+        $user->password = password_hash($this->post('password'), PASSWORD_DEFAULT);
+        $user->dateCreated = date("Y-m-d H:i:s");
+        $insertId = $user->save();
+
+        $this->load->model('WishList');
+        $wishList = new WishList();
+        $wishList->ownerId = $insertId;
+        $wishList->listName= $this->post('listName');;
+        $wishList->description = $this->post('description');;;
+        $wishList->listCreated = date("Y-m-d H:i:s");;
+
+        $wishList->save();
+
+        if (isset($user)){
+            $this->session->userLoggedIn = $user;
+            redirect('/List/Show', 'refresh');
+        }else{
+            print json_encode("Wrong pass");
+        }
     }
 
     /**
@@ -66,22 +97,25 @@ class Home extends CI_Controller
     /**
      * Show editable list to user.
      */
-    public function showListEditable()
+    public function list_get()
     {
         //Get user from session
         if (isset($this->session->userLoggedIn)) {
+            $this->output->enable_profiler(TRUE);
+
             $this->load->view('Navigation/UserNavigation/header');
-            //Load user data from model
+            //Load wish list data from model
             $this->load->model('WishList');
-            $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn->id);
+            //print_r($this->session->userLoggedIn['0']->id);
+            $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
             //return View
-            $this->load->view('Home/List', array(
+            $this->load->view('List/Show', array(
                 'wishList' => $wishList,
             ));
-            $this->load->view('Navigation/UserNavigation/footer');
+            //$this->load->view('Navigation/UserNavigation/footer');
         }else{
             //If no user, then redirect to login page
-            redirect('/Home/Login', 'refresh');
+            redirect('/User/Login', 'refresh');
         }
     }
 

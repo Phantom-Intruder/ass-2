@@ -1,5 +1,5 @@
 <script id="loginForm" type="text/html">
-    <form action="LoginSubmit.html" method="post">
+    <form method="post">
         <h3>Login</h3>
 
         <h5>Your Login details:</h5>
@@ -11,11 +11,12 @@
 
 <script>
     $(function() {
-        //Extend Backbone.Form and customise, set schema
-        var LoginForm = Backbone.Form.extend({
 
-            template: _.template($('#loginForm').html()),
-
+        var LoginModel = Backbone.Model.extend({
+            url: function(){
+                var urlLink = "http://localhost/Wishlist/index.php/Home/login"
+                return urlLink;
+            },
             schema: {
                 username: {
                     validators: ['required']
@@ -24,20 +25,36 @@
                     type: 'Password',
                     validators: ['required']
                 },
+            },
+            defaults: {
+                username: '',
+                password: ''
             }
-
         });
 
-        //Create the form instance and add to the page
-        var form = new LoginForm().render();
+        var loginModel = new LoginModel({});
 
-        $('body').append(form.el);
+        var LoginForm = new Backbone.Form({
+            model: loginModel,
+            template: _.template($('#loginForm').html()),
+        }).render();
+
+        $('body').append(LoginForm.el);
 
         //Run validation before submitting
-        form.on('submit', function(event) {
-            var errs = form.validate();
+        LoginForm.on('submit', function(event) {
+            var errs = LoginForm.validate();
 
-            if (errs) event.preventDefault();
+            if (errs){
+                event.preventDefault();
+            }
+            else{
+                event.preventDefault();
+                var username = $("#c1_username").val();
+                var password = $("#c1_password").val();
+                this.model.set({username: username, password: password});
+                this.model.save();
+            }
         });
 
     });

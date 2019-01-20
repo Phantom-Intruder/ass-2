@@ -3,6 +3,7 @@
 class User extends CI_Model {
     const DB_TABLE_NAME = 'user';
     const DB_TABLE_PK_VALUE = 'id';
+    const DB_TABLE_USERNAME = 'username';
 
     /**
  * User unique id
@@ -36,17 +37,20 @@ class User extends CI_Model {
 
     /**
      * Create a record for user.
+     * @return int insert id
      */
     private function insert(){
         $this->db->insert($this::DB_TABLE_NAME, $this);
         $this->{$this::DB_TABLE_PK_VALUE} = $this->db->insert_id();
+        return $this->db->insert_id();
     }
 
     /**
      * Insert user.
+     * @return int insert id
      */
     public function save(){
-        $this->insert();
+        return $this->insert();
     }
 
     /**
@@ -92,5 +96,31 @@ class User extends CI_Model {
             $ret_value[$row->{$this::DB_TABLE_PK_VALUE}] = $model;
         }
         return $ret_value;
+    }
+
+    /**
+     * Get user if exists
+     *
+     * @param string username
+     * @param string password
+     * @return User object
+     */
+    public function getUserFromLogin($username, $password){
+        $this->db->where($this::DB_TABLE_USERNAME, $username);
+        $ret_val = $this->db->get($this::DB_TABLE_NAME);
+        if ($ret_val->num_rows() != 1){
+            //No such user
+            return null;
+        }
+        else{
+            $row = $ret_val->result();
+            echo json_encode($row);
+            $password_hash = $row['0']->password;
+            if (password_verify($password, $password_hash)){
+                return $row;
+            }else{
+                return null;
+            }
+        }
     }
 }

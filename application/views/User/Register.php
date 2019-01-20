@@ -1,5 +1,5 @@
 <script id="registerForm" type="text/html">
-    <form>
+    <form method="post" >
         <h3>Register</h3>
 
         <h5>Your Login data:</h5>
@@ -16,6 +16,10 @@
     $(function() {
 
         var UserWishList = Backbone.Model.extend({
+            url: function(){
+                var urlLink = "http://localhost/Wishlist/index.php/Home/register"
+                return urlLink;
+            },
             schema: {
                 firstName: {
                     validators: ['required']
@@ -41,16 +45,17 @@
                     validators: ['required']
                 },
             },
+            defaults: {
+                firstName: '',
+                username: '',
+                password: '',
+                enterPasswordAgain: '',
+                listName: '',
+                description: ''
+            }
         });
 
-        var userWishList = new UserWishList({
-            firstName: '',
-            username: '',
-            password: '',
-            enterPasswordAgain: '',
-            listName: '',
-            description: ''
-        });
+        var userWishList = new UserWishList({});
 
         var RegisterForm = new Backbone.Form({
             model: userWishList,
@@ -63,8 +68,21 @@
         RegisterForm.on('submit', function(event) {
             var errs = RegisterForm.validate();
 
-            if (errs) event.preventDefault();
-        });
+            if (errs){
+                event.preventDefault();
+            }
+            else{
+                event.preventDefault();
 
+                var firstName = $("#c1_firstName").val();
+                var username = $("#c1_username").val();
+                var password = $("#c1_password").val();
+                var listName = $("#c1_listName").val();
+                var description = $("#c1_description").val();
+                this.model.set({firstName: firstName, username: username, password: password, listName: listName, description: description});
+                console.log(JSON.stringify(this.model));
+                this.model.save();
+            }
+        });
     });
 </script>

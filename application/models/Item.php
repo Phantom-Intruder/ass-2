@@ -12,6 +12,12 @@ class Item extends CI_Model {
     public $id;
 
     /**
+     * List id of item
+     * @var int
+     */
+    public $listId;
+
+    /**
      * Item title
      * @var string
      */

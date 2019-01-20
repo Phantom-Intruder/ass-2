@@ -4,6 +4,7 @@ class WishList extends CI_Model
 {
     const DB_TABLE_NAME = 'user_list';
     const DB_TABLE_PK_VALUE = 'id';
+    const DB_TABLE_USERID = "ownerId";
 
     /**
      * List unique id
@@ -93,6 +94,26 @@ class WishList extends CI_Model
             $ret_value[$row->{$this::DB_TABLE_PK_VALUE}] = $model;
         }
         return $ret_value;
+    }
+
+    /**
+     * Get wish list from user id
+     *
+     * @param int userId
+     * @return WishList object
+     */
+    public function getFromUserId($userId){
+        $this->db->where($this::DB_TABLE_USERID, $userId);
+        $ret_val = $this->db->get($this::DB_TABLE_NAME);
+        if ($ret_val->num_rows() != 1){
+            //No such user
+            return null;
+        }
+        else{
+            $row = $ret_val->result();
+            return $row;
+        }
+
     }
 
 }
