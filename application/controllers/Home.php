@@ -101,18 +101,27 @@ class Home extends REST_Controller
     {
         //Get user from session
         if (isset($this->session->userLoggedIn)) {
-            $this->output->enable_profiler(TRUE);
-
             $this->load->view('Navigation/UserNavigation/header');
+            //return View
+            $this->load->view('List/Show');
+            //$this->load->view('Navigation/UserNavigation/footer');
+        }else{
+            //If no user, then redirect to login page
+            redirect('/User/Login', 'refresh');
+        }
+    }
+
+    /**
+     * Gets items in users list with userID
+     */
+    public function item_get()
+    {
+        if (isset($this->session->userLoggedIn)) {
             //Load wish list data from model
             $this->load->model('WishList');
             //print_r($this->session->userLoggedIn['0']->id);
             $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
-            //return View
-            $this->load->view('List/Show', array(
-                'wishList' => $wishList,
-            ));
-            //$this->load->view('Navigation/UserNavigation/footer');
+            //get items from wishlist 
         }else{
             //If no user, then redirect to login page
             redirect('/User/Login', 'refresh');

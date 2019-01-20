@@ -18,17 +18,20 @@
 
     object_list_form = new Backbone.Form({
         schema: {
-            users: {
+            items: {
                 type: 'List',
                 itemType: 'Object',
                 itemToString: itemToString,
                 subSchema: {
-                    name: {}
+                    title: {},
+                    url: {},
+                    price: {},
+                    priority: {}
                 }
             }
         },
         data: {
-            users: [
+            items: [
                 {
                     name: '<a href="#">malicious injection</a>'
                 }

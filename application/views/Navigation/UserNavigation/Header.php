@@ -45,6 +45,7 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
         <script src=<?= base_url()."/js/vendor/backbone-forms.js"?>></script>
         <script src=<?= base_url()."/js/vendor/list.js"?>></script>
         <script src=<?= base_url()."/js/vendor/backbone.bootstrap-modal.min.js"?>></script>
+        <script src=<?= base_url()."/js/vendor/bootstrap.min.js"?>></script>
     </head>
     <body>
         <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
