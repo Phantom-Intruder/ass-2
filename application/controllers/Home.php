@@ -107,7 +107,7 @@ class Home extends REST_Controller
             //$this->load->view('Navigation/UserNavigation/footer');
         }else{
             //If no user, then redirect to login page
-            redirect('/User/Login', 'refresh');
+            redirect('/Home/Login', 'refresh');
         }
     }
 
@@ -116,12 +116,17 @@ class Home extends REST_Controller
      */
     public function item_get()
     {
+        header('Content-type: application/json');
         if (isset($this->session->userLoggedIn)) {
             //Load wish list data from model
             $this->load->model('WishList');
             //print_r($this->session->userLoggedIn['0']->id);
             $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
-            //get items from wishlist 
+            //get items from wishlist
+            $this->load->model('Item');
+            //echo $wishList[0]->id;
+            $items = $this->Item->getByListId($wishList[0]->id);
+            print json_encode($items);
         }else{
             //If no user, then redirect to login page
             redirect('/User/Login', 'refresh');

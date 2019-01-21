@@ -4,6 +4,7 @@ class Item extends CI_Model {
 
     const DB_TABLE_NAME = 'item';
     const DB_TABLE_PK_VALUE = 'id';
+    const DB_TABLE_LIST_ID = 'listId';
 
     /**
      * Item number unique id
@@ -117,6 +118,25 @@ class Item extends CI_Model {
         else{
             $query = $this->db->get($this::DB_TABLE_NAME);
         }
+        $ret_value = array();
+        $class = get_class($this);
+        foreach ($query->result() as $row){
+            $model = new $class;
+            $model->populate($row);
+            $ret_value[$row->{$this::DB_TABLE_PK_VALUE}] = $model;
+        }
+        return $ret_value;
+    }
+
+    /**
+     * Get all the items in a wish list
+     * @param int listId
+     * @return array of item objects
+     */
+    public function getByListId($listId){
+        $query = $this->db->get_where($this::DB_TABLE_NAME, array(
+            $this::DB_TABLE_LIST_ID => $listId,
+        ));
         $ret_value = array();
         $class = get_class($this);
         foreach ($query->result() as $row){

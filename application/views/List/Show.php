@@ -5,6 +5,15 @@
 <script>
     var itemToString, object_list_form;
 
+    var Items = Backbone.Model.extend({
+        url : function () {
+            var urlLink = "http://localhost/Wishlist/index.php/Home/item"
+            return urlLink;
+        },
+    });
+
+    var itemsFetched = new Items({});
+
     Backbone.Form.editors.List.Modal.ModalAdapter = Backbone.BootstrapModal;
 
     itemToString = function(value) {
@@ -17,6 +26,10 @@
     };
 
     object_list_form = new Backbone.Form({
+        initialize : function () {
+            itemsFetched.fetch()
+            echo itemsFetched
+        },
         schema: {
             items: {
                 type: 'List',
@@ -32,9 +45,7 @@
         },
         data: {
             items: [
-                {
-                    name: '<a href="#">malicious injection</a>'
-                }
+                itemsFetched.get('3')
             ]
         }
     });
