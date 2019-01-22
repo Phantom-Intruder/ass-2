@@ -146,8 +146,13 @@ class Home extends REST_Controller
         $item->title = $this->post('title');
         $item->url = $this->post('url');
         $item->price = $this->post('price');
-        $item->priority = $this->post('priority');
-
+        if ($this->post('priority') == "Must Have"){
+            $item->priority = 1;
+        }else if($this->post('priority') == "Would Be Nice To Have"){
+            $item->priority = 2;
+        }else{
+            $item->priority = 3;
+        }
         //Load wish list data from model
         $this->load->model('WishList');
         //print_r($this->session->userLoggedIn['0']->id);
@@ -157,6 +162,17 @@ class Home extends REST_Controller
         $item->itemCreated = date("Y-m-d H:i:s");;
 
         $item->save();
+    }
+
+    /**
+     * Deletes sent items from database
+     */
+    public function item_delete(){
+        header('Content-type: application/json');
+        $this->load->model('Item');
+        $item = new Item();
+        $item->delete($this->delete('id'));
+        echo $this->delete('id');
     }
 
         /**

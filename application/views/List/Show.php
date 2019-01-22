@@ -18,13 +18,28 @@
                 validators: ['required', 'number']
             },
             priority: {
-                type: 'Number',
-                validators: ['required', 'number']
+                type: 'Select',
+                options: ['Must Have', 'Would Be Nice To Have', 'If You Can']
             }
         },
         toString: function() {
             var attrs = this.attributes;
-            return attrs.title + ', ' + attrs.url + ', ' + attrs.price+ ', ' + attrs.priority;
+            return '<div class="container">' +
+                        '<div class="row">' +
+                            '<div class="col-sm">'
+                            + attrs.title +
+                            ',</div>' +
+                            '<div class="col-sm">'
+                            + attrs.url +
+                            ',</div>' +
+                            '<div class="col-sm">'
+                            + attrs.price+
+                            ',</div>' +
+                            '<div class="col-sm">'
+                            + attrs.priority+
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
         }
     });
 
@@ -77,17 +92,25 @@
             var listEditor = form.fields['items'].editor;
 
             listEditor.on('add', function(form, itemEditor) {
-                console.log('User with first name "' + itemEditor.getValue().url + '" added.');
-                var postedItems = new Items();
+                var addedItems = new Items();
 
                 var title = itemEditor.getValue().title;
                 var url = itemEditor.getValue().url;
                 var price = itemEditor.getValue().price;
                 var priority = itemEditor.getValue().priority;
-                postedItems.set({title: title, url: url, price: price, priority: priority});
-                console.log(postedItems);
-                postedItems.save();
-            })
+                addedItems.set({title: title, url: url, price: price, priority: priority});
+                console.log(addedItems);
+                addedItems.save();
+            });
+
+            listEditor.on('remove', function(form, itemEditor) {
+                var removedItems = new Items();
+
+                var id = itemEditor.getValue().id;
+                removedItems.set({id: id});
+                console.log(removedItems);
+                removedItems.destroy();
+            });
         }
     });
 </script>

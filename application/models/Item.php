@@ -142,6 +142,13 @@ class Item extends CI_Model {
         foreach ($query->result() as $row){
             $model = new $class;
             $model->populate($row);
+            if ($model->priority == 1){
+                $model->priority = "Must Have";
+            }else if($model->priority == 2){
+                $model->priority = "Would Be Nice To Have";
+            }else{
+                $model->priority = "If You Can";
+            }
             $ret_value[$row->{$this::DB_TABLE_PK_VALUE}] = $model;
         }
         return $ret_value;

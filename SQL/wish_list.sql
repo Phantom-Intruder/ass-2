@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2019 at 04:32 PM
+-- Generation Time: Jan 22, 2019 at 05:15 PM
 -- Server version: 5.6.20
 -- PHP Version: 5.5.15
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `item` (
   `price` decimal(4,2) NOT NULL,
   `priority` int(11) NOT NULL,
   `itemCreated` date NOT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `item`
@@ -42,7 +42,10 @@ CREATE TABLE IF NOT EXISTS `item` (
 
 INSERT INTO `item` (`id`, `listId`, `title`, `url`, `price`, `priority`, `itemCreated`) VALUES
 (1, 2, 'Tank', 'a.li/33', '99.99', 1, '2019-01-21'),
-(3, 2, 'Door Lock', 'a.ex/dlock', '10.00', 1, '2019-01-21');
+(3, 2, 'Door Lock', 'a.ex/dlock', '10.00', 1, '2019-01-21'),
+(4, 2, 'tut1 - 2015045', 'https://www.youtube.com/watch?v=51b7tZGKrGo', '1.00', 1, '2019-01-22'),
+(6, 2, 'Tutorial 2 - 2015045', 'https://www.youtube.com/watch?v=51b7tZGKrGo', '1.00', 2, '2019-01-22'),
+(7, 2, 'Tutorial 2 - 2015045', 'https://www.youtube.com/watch?v=51b7tZGKrGo', '1.00', 3, '2019-01-22');
 
 -- --------------------------------------------------------
 
@@ -134,7 +137,7 @@ ALTER TABLE `user_list`
 -- AUTO_INCREMENT for table `item`
 --
 ALTER TABLE `item`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `priority`
 --

@@ -23,7 +23,7 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Book Store</title>
+        <title>Wish List</title>
         <meta name="description" content="<?php html_escape($menu_items[$menu_current]['desc']); ?>">
         <meta name="viewport" content="width=device-width">
 
