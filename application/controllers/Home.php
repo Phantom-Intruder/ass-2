@@ -67,9 +67,9 @@ class Home extends REST_Controller
         $this->load->model('WishList');
         $wishList = new WishList();
         $wishList->ownerId = $insertId;
-        $wishList->listName= $this->post('listName');;
-        $wishList->description = $this->post('description');;;
-        $wishList->listCreated = date("Y-m-d H:i:s");;
+        $wishList->listName= $this->post('listName');
+        $wishList->description = $this->post('description');
+        $wishList->listCreated = date("Y-m-d H:i:s");
 
         $wishList->save();
 
@@ -134,6 +134,32 @@ class Home extends REST_Controller
     }
 
     /**
+     * Gets posted item and adds it
+     */
+    public function item_post()
+    {
+        header('Content-type: application/json');
+        date_default_timezone_set('Asia/Colombo');
+
+        $this->load->model('Item');
+        $item = new Item();
+        $item->title = $this->post('title');
+        $item->url = $this->post('url');
+        $item->price = $this->post('price');
+        $item->priority = $this->post('priority');
+
+        //Load wish list data from model
+        $this->load->model('WishList');
+        //print_r($this->session->userLoggedIn['0']->id);
+        $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
+
+        $item->listId = $wishList[0]->id;
+        $item->itemCreated = date("Y-m-d H:i:s");;
+
+        $item->save();
+    }
+
+        /**
      * Show viewable list to anonymous user.
      * @param int $listId
      */
