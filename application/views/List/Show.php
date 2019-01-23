@@ -1,9 +1,10 @@
-<h3 class="panel-title">Object List</h3>
+<h3 class="panel-title">Items List</h3>
 
 <div id="object-list" class="panel-body"></div>
 
 <script>
     var Item = Backbone.Model.extend({
+        url: "<?= base_url().'index.php/Home/Item'; ?>",
         schema : {
             title: {
                 type: 'Text',
@@ -21,6 +22,9 @@
                 type: 'Select',
                 options: ['Must Have', 'Would Be Nice To Have', 'If You Can']
             }
+        },
+        defaults: {
+          id: ""
         },
         toString: function() {
             var attrs = this.attributes;
@@ -44,10 +48,7 @@
     });
 
     var Items = Backbone.Model.extend({
-        url: function(){
-            var urlLink = "http://localhost/Wishlist/index.php/Home/Item"
-            return urlLink;
-        },
+        url: "<?= base_url().'index.php/Home/Items'; ?>",
         defaults : {
             item: {}
         }
@@ -64,18 +65,28 @@
     });
 
     var arrayOfItems = [];
+    var mustHaves = [];
+    var wouldLike = [];
+    var ifCar = [];
+
     var items = new Items();
     var form;
 
     items.fetch({
         success: function () {
-            for (var i = 0; i < 10; i++){
+            for (var i = 0; i < 100; i++){
                 if (items.get(''+i+'') !== undefined){
                     console.log(items.get(''+i+''));
-                    arrayOfItems.push(items.get(''+i+''));
+                    if (items.get(''+i+'').priority === 'Must Have'){
+                        mustHaves.push(items.get(''+i+''));
+                    }else if (items.get(''+i+'').priority === 'Would Be Nice To Have'){
+                        wouldLike.push(items.get(''+i+''));
+                    }else{
+                        ifCar.push(items.get(''+i+''));
+                    }
                 }
             }
-
+            arrayOfItems = mustHaves.concat(wouldLike).concat(ifCar);
             var wishListModel = new WishList({
                 items: arrayOfItems
             });
@@ -92,24 +103,28 @@
             var listEditor = form.fields['items'].editor;
 
             listEditor.on('add', function(form, itemEditor) {
-                var addedItems = new Items();
-
+                var addedItem = new Item();
                 var title = itemEditor.getValue().title;
                 var url = itemEditor.getValue().url;
                 var price = itemEditor.getValue().price;
                 var priority = itemEditor.getValue().priority;
-                addedItems.set({title: title, url: url, price: price, priority: priority});
-                console.log(addedItems);
-                addedItems.save();
+                addedItem.set({title: title, url: url, price: price, priority: priority});
+                //console.log(addedItems);
+                addedItem.save({
+                    success: function (response) {
+
+                    }
+                });
             });
 
             listEditor.on('remove', function(form, itemEditor) {
-                var removedItems = new Items();
+                var removedItem = new Item();
 
                 var id = itemEditor.getValue().id;
-                removedItems.set({id: id});
-                console.log(removedItems);
-                removedItems.destroy();
+                removedItem.url = removedItem.url + '/' + id;
+                console.log(removedItem);
+
+                removedItem.destroy();
             });
         }
     });

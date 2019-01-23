@@ -54,6 +54,7 @@ class Item extends CI_Model {
     private function insert(){
         $this->db->insert($this::DB_TABLE_NAME, $this);
         $this->{$this::DB_TABLE_PK_VALUE} = $this->db->insert_id();
+        return $this->db->insert_id();
     }
 
     /**
@@ -62,9 +63,9 @@ class Item extends CI_Model {
      */
     public function save(){
         if (isset($this->{$this::DB_TABLE_PK_VALUE})){
-            $this->update();
+            return $this->update();
         }else{
-            $this->insert();
+            return $this->insert();
         }
     }
 
@@ -81,6 +82,7 @@ class Item extends CI_Model {
      */
     private function update(){
         $this->db->update($this::DB_TABLE_NAME, $this, $this::DB_TABLE_PK_VALUE);
+        return $this->id;
     }
 
     /**
@@ -134,6 +136,7 @@ class Item extends CI_Model {
      * @return array of item objects
      */
     public function getByListId($listId){
+        $this->db->order_by("priority", "desc");
         $query = $this->db->get_where($this::DB_TABLE_NAME, array(
             $this::DB_TABLE_LIST_ID => $listId,
         ));

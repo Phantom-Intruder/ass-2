@@ -114,7 +114,7 @@ class Home extends REST_Controller
     /**
      * Gets items in users list with userID
      */
-    public function item_get()
+    public function items_get()
     {
         header('Content-type: application/json');
         if (isset($this->session->userLoggedIn)) {
@@ -161,18 +161,23 @@ class Home extends REST_Controller
         $item->listId = $wishList[0]->id;
         $item->itemCreated = date("Y-m-d H:i:s");;
 
-        $item->save();
+        $itemId = $item->save();
+        $data['itemId'] = $itemId;
+        print json_encode($data);
     }
 
     /**
      * Deletes sent items from database
      */
-    public function item_delete(){
+    public function item_delete($id){
         header('Content-type: application/json');
+
         $this->load->model('Item');
         $item = new Item();
-        $item->delete($this->delete('id'));
-        echo $this->delete('id');
+
+        $item->delete($id);
+        $data['itemId'] = $id;
+        print json_encode($data);
     }
 
         /**

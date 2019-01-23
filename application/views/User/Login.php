@@ -14,7 +14,7 @@
 
         var LoginModel = Backbone.Model.extend({
             url: function(){
-                var urlLink = "http://localhost/Wishlist/index.php/Home/login"
+                var urlLink = "<?= base_url().'/index.php/Home/login'; ?>"
                 return urlLink;
             },
             schema: {

@@ -17,7 +17,7 @@
 
         var UserWishList = Backbone.Model.extend({
             url: function(){
-                var urlLink = "http://localhost/Wishlist/index.php/Home/register"
+               var urlLink = "<?= base_url().'index.php/Home/register'; ?>"
                 return urlLink;
             },
             schema: {
