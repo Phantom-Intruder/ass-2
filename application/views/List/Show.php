@@ -24,7 +24,11 @@
             }
         },
         defaults: {
-          id: ""
+            id: "",
+            title: "",
+            url : "",
+            price: 0,
+            priority: "Must Have"
         },
         toString: function() {
             var attrs = this.attributes;
@@ -64,10 +68,9 @@
         }
     });
 
-    var arrayOfItems = [];
     var mustHaves = [];
     var wouldLike = [];
-    var ifCar = [];
+    var ifCan = [];
 
     var items = new Items();
     var form;
@@ -82,50 +85,117 @@
                     }else if (items.get(''+i+'').priority === 'Would Be Nice To Have'){
                         wouldLike.push(items.get(''+i+''));
                     }else{
-                        ifCar.push(items.get(''+i+''));
+                        ifCan.push(items.get(''+i+''));
                     }
                 }
             }
-            arrayOfItems = mustHaves.concat(wouldLike).concat(ifCar);
-            var wishListModel = new WishList({
-                items: arrayOfItems
-            });
 
-            Backbone.Form.editors.List.Modal.ModalAdapter = Backbone.BootstrapModal;
+            function renderViewModel(mustHaves, wouldLike, ifCan) {
+                var arrayOfItems = [];
 
-            form = new Backbone.Form({
-                model: wishListModel,
-                validate: true
-            }).render();
+                console.log(mustHaves, wouldLike, ifCan);
+                arrayOfItems = mustHaves.concat(wouldLike).concat(ifCan);
 
-            $('.panel-body').html(form.el);
+                var wishListModel = new WishList({
+                    items: arrayOfItems
+                });
 
-            var listEditor = form.fields['items'].editor;
+                Backbone.Form.editors.List.Modal.ModalAdapter = Backbone.BootstrapModal;
 
-            listEditor.on('add', function(form, itemEditor) {
-                var addedItem = new Item();
-                var title = itemEditor.getValue().title;
-                var url = itemEditor.getValue().url;
-                var price = itemEditor.getValue().price;
-                var priority = itemEditor.getValue().priority;
-                addedItem.set({title: title, url: url, price: price, priority: priority});
-                //console.log(addedItems);
-                addedItem.save({
-                    success: function (response) {
+                form = new Backbone.Form({
+                    model: wishListModel,
+                    validate: true
+                }).render();
 
+                $('.panel-body').html(form.el);
+
+                var listEditor = form.fields['items'].editor;
+
+                listEditor.on('add', function(form, itemEditor) {
+                    var addedItem = new Item();
+                    var title = itemEditor.getValue().title;
+                    var url = itemEditor.getValue().url;
+                    var price = itemEditor.getValue().price;
+                    var priority = itemEditor.getValue().priority;
+                    addedItem.set({title: title, url: url, price: price, priority: priority});
+                    addedItem.save(null, {
+                        type : 'POST',
+                        success: function (response) {
+                            if (response.get('priority') === 1){
+                                mustHaves.push({
+                                    id: response.get('id'),
+                                    title: response.get('title'),
+                                    url: response.get('url'),
+                                    price: response.get('price'),
+                                    priority: "Must Have"
+                                });
+                            }else if (response.get('priority') === 2){
+                                wouldLike.push({
+                                    id: response.get('id'),
+                                    title: response.get('title'),
+                                    url: response.get('url'),
+                                    price: response.get('price'),
+                                    priority: "Would Be Nice To Have"
+                                });
+                            }else{
+                                ifCan.push({
+                                    id: response.get('id'),
+                                    title: response.get('title'),
+                                    url: response.get('url'),
+                                    price: response.get('price'),
+                                    priority: "If You Can"
+                                });
+                            }
+                            //console.log(response.get('priority'));
+                            renderViewModel(mustHaves, wouldLike, ifCan);
+                        }
+                    });
+                });
+
+                listEditor.on('remove', function(form, itemEditor) {
+                    var removedItem = new Item();
+
+                    var id = itemEditor.getValue().id;
+                    removedItem.url = removedItem.url + '/' + id;
+                    console.log(removedItem);
+
+                    removedItem.destroy({
+                        success: function () {
+
+                        }
+                    });
+                });
+
+                listEditor.on('item:change', function(form, itemEditor) {
+                    var updatedItem = new Item();
+
+                    var id = itemEditor.getValue().id;
+                    var title = itemEditor.getValue().title;
+                    var url = itemEditor.getValue().url;
+                    var price = itemEditor.getValue().price;
+                    var priority = itemEditor.getValue().priority;
+
+                    updatedItem.set({id: id, title: title, url: url, price: price, priority: priority});
+                    //console.log(updatedItem);
+                    if (id !== undefined){
+                        updatedItem.save(null, {
+                            type : 'PUT',
+                            success: function (response) {
+                                if (response.priority === 1){
+                                    mustHaves.push(response);
+                                }else if (response.priority === 2){
+                                    wouldLike.push(response);
+                                }else{
+                                    ifCan.push(response);
+                                }
+                                //renderViewModel(mustHaves, wouldLike, ifCan);
+                            }
+                        });
                     }
                 });
-            });
+            }
 
-            listEditor.on('remove', function(form, itemEditor) {
-                var removedItem = new Item();
-
-                var id = itemEditor.getValue().id;
-                removedItem.url = removedItem.url + '/' + id;
-                console.log(removedItem);
-
-                removedItem.destroy();
-            });
+            renderViewModel(mustHaves, wouldLike, ifCan);
         }
     });
 </script>

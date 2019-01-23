@@ -162,8 +162,9 @@ class Home extends REST_Controller
         $item->itemCreated = date("Y-m-d H:i:s");;
 
         $itemId = $item->save();
-        $data['itemId'] = $itemId;
-        print json_encode($data);
+        $item->id = $itemId;
+        $data['itemData'] = $item;
+        print json_encode($item);
     }
 
     /**
@@ -177,6 +178,40 @@ class Home extends REST_Controller
 
         $item->delete($id);
         $data['itemId'] = $id;
+        print json_encode($data);
+    }
+
+    /**
+     * Updates one item
+     */
+    public function item_put()
+    {
+        header('Content-type: application/json');
+        date_default_timezone_set('Asia/Colombo');
+
+        $this->load->model('Item');
+        $item = new Item();
+        $item->title = $this->post('title');
+        $item->url = $this->post('url');
+        $item->price = $this->post('price');
+        if ($this->post('priority') == "Must Have"){
+            $item->priority = 1;
+        }else if($this->post('priority') == "Would Be Nice To Have"){
+            $item->priority = 2;
+        }else{
+            $item->priority = 3;
+        }
+        //Load wish list data from model
+        $this->load->model('WishList');
+        //print_r($this->session->userLoggedIn['0']->id);
+        $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
+
+        $item->listId = $wishList[0]->id;
+        $item->itemCreated = date("Y-m-d H:i:s");;
+
+        $itemId = $item->save();
+        $item->id = $itemId;
+        $data['itemData'] = $item;
         print json_encode($data);
     }
 
