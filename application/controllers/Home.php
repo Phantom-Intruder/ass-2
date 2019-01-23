@@ -163,7 +163,6 @@ class Home extends REST_Controller
 
         $itemId = $item->save();
         $item->id = $itemId;
-        $data['itemData'] = $item;
         print json_encode($item);
     }
 
@@ -177,8 +176,8 @@ class Home extends REST_Controller
         $item = new Item();
 
         $item->delete($id);
-        $data['itemId'] = $id;
-        print json_encode($data);
+        $item->id = (int)$id;
+        print json_encode($item);
     }
 
     /**

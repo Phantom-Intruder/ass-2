@@ -146,7 +146,7 @@
                                     priority: "If You Can"
                                 });
                             }
-                            //console.log(response.get('priority'));
+                            //console.log(response.get('id'));
                             renderViewModel(mustHaves, wouldLike, ifCan);
                         }
                     });
@@ -160,8 +160,8 @@
                     console.log(removedItem);
 
                     removedItem.destroy({
-                        success: function () {
-
+                        success: function (response) {
+                            console.log(response.get('id'));
                         }
                     });
                 });
@@ -176,7 +176,7 @@
                     var priority = itemEditor.getValue().priority;
 
                     updatedItem.set({id: id, title: title, url: url, price: price, priority: priority});
-                    //console.log(updatedItem);
+                    console.log(updatedItem);
                     if (id !== undefined){
                         updatedItem.save(null, {
                             type : 'PUT',
