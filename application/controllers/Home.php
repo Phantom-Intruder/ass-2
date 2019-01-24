@@ -134,6 +134,29 @@ class Home extends REST_Controller
     }
 
     /**
+     * Show non editable page
+     */
+    public function list_view_get($id){
+        $this->load->view('Navigation/UserNavigation/Header');
+        $this->load->library('table');
+        //if user not logged in,
+        $this->load->model('Item');
+        $items = $this->Item->getByListId($id);
+        $itemsList = array();
+        foreach ($items as $item){
+            $itemsList[] = array(
+                $item->title,
+                $item->url,
+                $item->price,
+                $item->priority,
+            );
+        }
+        $this->load->view('List/View', array(
+            'items' => $itemsList
+        ));
+    }
+
+    /**
      * Gets posted item and adds it
      */
     public function item_post()
@@ -190,12 +213,13 @@ class Home extends REST_Controller
 
         $this->load->model('Item');
         $item = new Item();
-        $item->title = $this->post('title');
-        $item->url = $this->post('url');
-        $item->price = $this->post('price');
-        if ($this->post('priority') == "Must Have"){
+        $item->id = $this->put('id');
+        $item->title = $this->put('title');
+        $item->url = $this->put('url');
+        $item->price = $this->put('price');
+        if ($this->put('priority') == "Must Have"){
             $item->priority = 1;
-        }else if($this->post('priority') == "Would Be Nice To Have"){
+        }else if($this->put('priority') == "Would Be Nice To Have"){
             $item->priority = 2;
         }else{
             $item->priority = 3;
@@ -210,8 +234,7 @@ class Home extends REST_Controller
 
         $itemId = $item->save();
         $item->id = $itemId;
-        $data['itemData'] = $item;
-        print json_encode($data);
+        print json_encode($item);
     }
 
         /**

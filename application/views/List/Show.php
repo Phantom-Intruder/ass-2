@@ -1,11 +1,14 @@
 <h3 class="panel-title">Items List</h3>
 
-<div id="object-list" class="panel-body"></div>
+    <div id="object-list" class="panel-body"></div>
 
 <script>
     var Item = Backbone.Model.extend({
         url: "<?= base_url().'index.php/Home/Item'; ?>",
         schema : {
+            id: {
+              type: 'Hidden'
+            },
             title: {
                 type: 'Text',
                 validators: ['required']
@@ -32,18 +35,18 @@
         },
         toString: function() {
             var attrs = this.attributes;
-            return '<div class="container">' +
-                        '<div class="row">' +
-                            '<div class="col-sm">'
+            return '<br/><div style="border:1px solid black" class="container">' +
+                        '<div class="row" style="margin-left: 8px ">' +
+                            '<div class="col-sm"><strong> Title: </strong>'
                             + attrs.title +
-                            ',</div>' +
-                            '<div class="col-sm">'
+                            '</div>' +
+                            '<div class="col-sm"><strong> URL: </strong>'
                             + attrs.url +
-                            ',</div>' +
-                            '<div class="col-sm">'
+                            '</div>' +
+                            '<div class="col-sm"><strong> Price: </strong>'
                             + attrs.price+
-                            ',</div>' +
-                            '<div class="col-sm">'
+                            '</div>' +
+                            '<div class="col-sm"><strong> Priority: </strong>'
                             + attrs.priority+
                             '</div>' +
                         '</div>' +
@@ -160,8 +163,29 @@
                     console.log(removedItem);
 
                     removedItem.destroy({
-                        success: function (response) {
-                            console.log(response.get('id'));
+                        success: function () {
+                            console.log(id);
+                            var priority = itemEditor.getValue().priority;
+                            if (priority === "Must Have"){
+                                for (var i = 0; i < mustHaves.length; i++){
+                                    if (mustHaves[i].id === id){
+                                        mustHaves = mustHaves.splice(i, 1);
+                                    }
+                                }
+                            }else if (priority === "Would Be Nice To Have"){
+                                for (var i = 0; i < wouldLike.length; i++){
+                                    if (wouldLike[i].id === id){
+                                        wouldLike = wouldLike.splice(i, 1);
+                                    }
+                                }
+                            }else{
+                                for (var i = 0; i < ifCan.length; i++){
+                                    if (ifCan[i].id === id){
+                                        ifCan = ifCan.splice(i, 1);
+                                    }
+                                }
+                            }
+                            //renderViewModel(mustHaves, wouldLike, ifCan);
                         }
                     });
                 });
