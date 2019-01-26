@@ -1,5 +1,5 @@
 <script id="registerForm" type="text/html">
-    <form method="post" >
+    <form style="margin-left: 50px" method="post" >
         <h3>Register</h3>
 
         <h5>Your Login data:</h5>
@@ -82,6 +82,7 @@
                 this.model.set({firstName: firstName, username: username, password: password, listName: listName, description: description});
                 console.log(JSON.stringify(this.model));
                 this.model.save();
+                window.location = "<?= base_url().'/index.php/Home/List'; ?>"
             }
         });
     });

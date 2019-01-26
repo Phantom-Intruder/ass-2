@@ -2,7 +2,22 @@
 
     <div id="object-list" class="panel-body"></div>
 
+<button class="btn btn-warning" id="getLink">Get shareable link</button>
+<div id="shareable-link"></div>
+
+<!--php echo "<h5>Shareable link:</h5><a target='_blank' href= '". base_url()."index.php/Home/list_view/".html_escape($wishListId). "'>". base_url().'index.php/Home/list_view/'.html_escape($wishListId). "</a>"; ?>-->
 <script>
+    var ShareableLink = Backbone.Model.extend({
+        url: "<?= base_url().'index.php/Home/link'; ?>",
+        defaults: {
+            link: ""
+        },
+        toString: function() {
+            var attrs = this.attributes;
+            return attrs.link;
+        }
+    });
+
     var Item = Backbone.Model.extend({
         url: "<?= base_url().'index.php/Home/Item'; ?>",
         schema : {
@@ -90,21 +105,15 @@
                     }else{
                         ifCan.push(items.get(''+i+''));
                     }
+                    //console.log(mustHaves, wouldLike, ifCan);
                 }
             }
 
             function renderViewModel(mustHaves, wouldLike, ifCan) {
                 var arrayOfItems = [];
 
-                console.log(mustHaves, wouldLike, ifCan);
+                console.log("must", mustHaves, "would", wouldLike, "if", ifCan);
                 arrayOfItems = mustHaves.concat(wouldLike).concat(ifCan);
-
-                for (var i = 0; i < arrayOfItems.length; i++){
-                    if (arrayOfItems[i].price === undefined){
-                        console.log(arrayOfItems[i].price === undefined);
-                        arrayOfItems.splice(Number(i), 1);
-                    }
-                }
 
                 var wishListModel = new WishList({
                     items: arrayOfItems
@@ -147,7 +156,7 @@
                                     price: response.get('price'),
                                     priority: "Would Be Nice To Have"
                                 });
-                            }else{
+                            }else if (response.get('priority') === 3){
                                 ifCan.push({
                                     id: response.get('id'),
                                     title: response.get('title'),
@@ -156,7 +165,7 @@
                                     priority: "If You Can"
                                 });
                             }
-                            console.log(mustHaves, wouldLike, ifCan);
+                            //console.log(mustHaves, wouldLike, ifCan);
                             renderViewModel(mustHaves, wouldLike, ifCan);
                         }
                     });
@@ -185,7 +194,7 @@
                                         wouldLike.splice(Number(i), 1);
                                     }
                                 }
-                            }else{
+                            }else if (priority === "If You Can"){
                                 for (var i = 0; i < ifCan.length; i++){
                                     if (ifCan[i].id === id){
                                         ifCan.splice(Number(i), 1);
@@ -207,17 +216,62 @@
                     var priority = itemEditor.getValue().priority;
 
                     updatedItem.set({id: id, title: title, url: url, price: price, priority: priority});
-                    //console.log(updatedItem);
-                    if (id !== undefined){
+                    if ((id !== "") && (id !== undefined)){
+                        console.log(id);
                         updatedItem.save(null, {
                             type : 'PUT',
                             success: function (response) {
                                 if (response.priority === 1){
-                                    mustHaves.push(response);
+                                    for (var i = 0; i < mustHaves.length; i++){
+                                        if (mustHaves[i].id === id){
+                                            if (mustHaves[i].title !== title){
+                                                mustHaves[i].title = title;
+                                            }
+                                            if (mustHaves[i].url !== url){
+                                                mustHaves[i].url = url;
+                                            }
+                                            if (mustHaves[i].price !== price){
+                                                mustHaves[i].price = price;
+                                            }
+                                            if (mustHaves[i].priority !== priority){
+                                                mustHaves[i].priority = priority;
+                                            }
+                                        }
+                                    }
                                 }else if (response.priority === 2){
-                                    wouldLike.push(response);
-                                }else{
-                                    ifCan.push(response);
+                                    for (var i = 0; i < wouldLike.length; i++){
+                                        if (wouldLike[i].id === id){
+                                            if (wouldLike[i].title !== title){
+                                                wouldLike[i].title = title;
+                                            }
+                                            if (wouldLike[i].url !== url){
+                                                wouldLike[i].url = url;
+                                            }
+                                            if (wouldLike[i].price !== price){
+                                                wouldLike[i].price = price;
+                                            }
+                                            if (wouldLike[i].priority !== priority){
+                                                wouldLike[i].priority = priority;
+                                            }
+                                        }
+                                    }
+                                }else if (response.priority === 3){
+                                    for (var i = 0; i < ifCan.length; i++){
+                                        if (ifCan[i].id === id){
+                                            if (ifCan[i].title !== title){
+                                                ifCan[i].title = title;
+                                            }
+                                            if (ifCan[i].url !== url){
+                                                ifCan[i].url = url;
+                                            }
+                                            if (ifCan[i].price !== price){
+                                                ifCan[i].price = price;
+                                            }
+                                            if (ifCan[i].priority !== priority){
+                                                ifCan[i].priority = priority;
+                                            }
+                                        }
+                                    }
                                 }
                                 //renderViewModel(mustHaves, wouldLike, ifCan);
                             }
@@ -228,5 +282,14 @@
 
             renderViewModel(mustHaves, wouldLike, ifCan);
         }
+    });
+
+    $('#getLink').click(function () {
+        var shareableLink = new ShareableLink();
+        shareableLink.fetch({
+            success: function () {
+            console.log(shareableLink.get('link'));
+            $('#shareable-link').append("<a target='_blank' href= '" + shareableLink.get('link') + "'>" + shareableLink.get('link') + "</a>");
+        }});
     });
 </script>

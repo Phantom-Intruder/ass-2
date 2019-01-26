@@ -5,13 +5,35 @@ class Home extends REST_Controller
 {
 
     /**
+     * Show editable list to user.
+     */
+    public function index_get()
+    {
+        //Get user from session
+        if (isset($this->session->wishListId)) {
+            $this->load->view('Navigation/UserNavigation/header');
+            //return View
+            $this->load->model('User');
+
+            $wishListId = $this->session->wishListId;
+
+            $this->load->view('List/Show', array(
+                'wishListId' => $wishListId,
+            ));
+        }else{
+            //If no user, then redirect to login page
+            redirect('/Home/Login', 'refresh');
+        }
+    }
+
+    /**
      * Shows login page to user if not logged in.
      */
     public function login_get()
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
-        if (!isset($this->session->userLoggedIn)) {
+        if (!isset($this->session->wishListId)) {
             $this->load->view('User/Login');
         }else{
             redirect('/Home/List', 'refresh');
@@ -27,10 +49,16 @@ class Home extends REST_Controller
         $this->load->model('User');
         $user = $this->User->getUserFromLogin($this->post('username'), $this->post('password'));
         if (isset($user)){
-            $this->session->userLoggedIn = $user;
-            redirect('/Home/List', 'refresh');
+
+            $this->load->model('WishList');
+            $wishList = $this->WishList->getFromUserId($user['0']->id);
+            $this->session->firstName = $user['0']->firstName;
+            $this->session->wishListId = $wishList['0']->id;
+            $data['loginValid'] = true;
+            print json_encode($data);
         }else{
-            print json_encode("Wrong pass");
+            $data['loginValid'] = false;
+            print json_encode($data);
         }
     }
 
@@ -41,7 +69,7 @@ class Home extends REST_Controller
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
-        if (!isset($this->session->userLoggedIn)) {
+        if (!isset($this->session->wishListId)) {
             $this->load->view('User/Register');
         }else{
             $this->load->view('User/AlreadyLoggedIn');
@@ -74,8 +102,8 @@ class Home extends REST_Controller
         $wishList->save();
 
         if (isset($user)){
-            $this->session->userLoggedIn = $user;
-            redirect('/List/Show', 'refresh');
+            $this->session->wishListId = $wishList->id;
+            $this->session->firstName = $user->firstName;
         }else{
             print json_encode("Wrong pass");
         }
@@ -84,29 +112,13 @@ class Home extends REST_Controller
     /**
      * Logout a user
      */
-    public function logout(){
+    public function logout_get(){
         header('Content-type: application/json');
-        if (isset($this->session->userLoggedIn )){
-            $this->session->userLoggedIn = null;
+        if (isset($this->session->wishListId)){
+            session_destroy();
+            redirect('/Home/Login', 'refresh');
         }else{
             print json_encode("Not logged in");
-        }
-    }
-
-
-    /**
-     * Show editable list to user.
-     */
-    public function list_get()
-    {
-        //Get user from session
-        if (isset($this->session->userLoggedIn)) {
-            $this->load->view('Navigation/UserNavigation/header');
-            //return View
-            $this->load->view('List/Show');
-        }else{
-            //If no user, then redirect to login page
-            redirect('/Home/Login', 'refresh');
         }
     }
 
@@ -116,15 +128,10 @@ class Home extends REST_Controller
     public function items_get()
     {
         header('Content-type: application/json');
-        if (isset($this->session->userLoggedIn)) {
-            //Load wish list data from model
-            $this->load->model('WishList');
-            //print_r($this->session->userLoggedIn['0']->id);
-            $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
-            //get items from wishlist
+        if (isset($this->session->wishListId)) {
             $this->load->model('Item');
             //echo $wishList[0]->id;
-            $items = $this->Item->getByListId($wishList[0]->id);
+            $items = $this->Item->getByListId($this->session->wishListId);
             print json_encode($items);
         }else{
             //If no user, then redirect to login page
@@ -138,7 +145,11 @@ class Home extends REST_Controller
     public function list_view_get($id){
         $this->load->view('Navigation/UserNavigation/Header');
         $this->load->library('table');
-        //if user not logged in,
+
+        $this->load->model('WishList');
+        $wishList = new WishList();
+        $wishList->load($this->session->wishListId);
+
         $this->load->model('Item');
         $items = $this->Item->getByListId($id);
         $itemsList = array();
@@ -151,6 +162,8 @@ class Home extends REST_Controller
             );
         }
         $this->load->view('List/View', array(
+            'firstName' => $this->session->firstName,
+            'wishList' => $wishList,
             'items' => $itemsList
         ));
     }
@@ -177,8 +190,8 @@ class Home extends REST_Controller
         }
         //Load wish list data from model
         $this->load->model('WishList');
-        //print_r($this->session->userLoggedIn['0']->id);
-        $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
+
+        $wishList = $this->WishList->getFromUserId($this->session->wishListId);
 
         $item->listId = $wishList[0]->id;
         $item->itemCreated = date("Y-m-d H:i:s");;
@@ -223,12 +236,8 @@ class Home extends REST_Controller
         }else{
             $item->priority = 3;
         }
-        //Load wish list data from model
-        $this->load->model('WishList');
-        //print_r($this->session->userLoggedIn['0']->id);
-        $wishList = $this->WishList->getFromUserId($this->session->userLoggedIn['0']->id);
 
-        $item->listId = $wishList[0]->id;
+        $item->listId = $this->session->wishListId;
         $item->itemCreated = date("Y-m-d H:i:s");;
 
         $itemId = $item->save();
@@ -236,70 +245,12 @@ class Home extends REST_Controller
         print json_encode($item);
     }
 
-        /**
-     * Show viewable list to anonymous user.
-     * @param int $listId
-     */
-    public function showListViewable($listId)
-    {
-        $this->load->view('Navigation/UserNavigation/header');
-        //Get list data from model
-        $this->load->model('WishList');
-        $wishList = new WishList();
-        $wishList->load($listId);
-        $wishList = $this->WishList->getFromListId($listId);
-        //return View
-        $this->load->view('Home/List', array(
-            'wishList' => $wishList,
-        ));
-        $this->load->view('Navigation/UserNavigation/footer');
-    }
-
     /**
-     * Show add form for item .
-     * @param int $itemId
+     * Gets shareable link
      */
-    public function showItemForm($itemId)
-    {
-        //If listId is set then:
-        if (isset($listId)){
-            // Get data from model for listId
-            $this->load->model('Item');
-            $item = new Item();
-            $item->load($itemId);
-            $this->load->view('Home/Item/Show', array(
-                'item' => $item,
-            ));
-        }else{
-            // show empty form
-            $this->load->view('Home/Item/Show');
-        }
-        //insert or update model and db
-    }
-
-    /**
-     * Add or update item
-     * @param item $item
-     */
-    public function addOrUpdateItem($item)
-    {
-        $this->load->model('Item');
-        $changedItem = new Item();
-        $changedItem = $item;
-        $changedItem->save();
-    }
-
-    /**
-     * Delete item from db and list.
-     * @param int $itemId
-     */
-    public function deleteItem($itemId)
-    {
-        //check if item exists
-        $this->load->model('Item');
-        $item = new Item();
-        //If yes then delete
-        $item->load($itemId);
-        $item->delete($itemId);
+    public function link_get(){
+        header('Content-type: application/json');
+        $data['link'] = base_url()."index.php/Home/list_view/".html_escape($this->session->wishListId);
+        print json_encode($data);
     }
 }

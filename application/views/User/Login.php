@@ -1,5 +1,5 @@
 <script id="loginForm" type="text/html">
-    <form method="post">
+    <form style="margin-left: 50px" method="post">
         <h3>Login</h3>
 
         <h5>Your Login details:</h5>
@@ -53,8 +53,16 @@
                 var username = $("#c1_username").val();
                 var password = $("#c1_password").val();
                 this.model.set({username: username, password: password});
-                this.model.save();
-                window.location = "http://localhost:8090/Wishlist/index.php/Home/List";
+                this.model.save({
+                    success: function (response) {
+                        console.log(response);
+                        if (!response.loginValid){
+                            alert("Incorrect username or password");
+                        }else{
+                            window.location = "<?= base_url().'/index.php/Home/List'; ?>"
+                        }
+                    }
+                });
             }
         });
 
