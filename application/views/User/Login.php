@@ -54,6 +54,7 @@
                 var password = $("#c1_password").val();
                 this.model.set({username: username, password: password});
                 this.model.save();
+                window.location = "http://localhost:8090/Wishlist/index.php/Home/List";
             }
         });
 

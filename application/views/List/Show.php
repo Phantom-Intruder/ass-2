@@ -82,7 +82,7 @@
         success: function () {
             for (var i = 0; i < 100; i++){
                 if (items.get(''+i+'') !== undefined){
-                    console.log(items.get(''+i+''));
+                    //console.log(items.get(''+i+''));
                     if (items.get(''+i+'').priority === 'Must Have'){
                         mustHaves.push(items.get(''+i+''));
                     }else if (items.get(''+i+'').priority === 'Would Be Nice To Have'){
@@ -98,6 +98,13 @@
 
                 console.log(mustHaves, wouldLike, ifCan);
                 arrayOfItems = mustHaves.concat(wouldLike).concat(ifCan);
+
+                for (var i = 0; i < arrayOfItems.length; i++){
+                    if (arrayOfItems[i].price === undefined){
+                        console.log(arrayOfItems[i].price === undefined);
+                        arrayOfItems.splice(Number(i), 1);
+                    }
+                }
 
                 var wishListModel = new WishList({
                     items: arrayOfItems
@@ -149,7 +156,7 @@
                                     priority: "If You Can"
                                 });
                             }
-                            //console.log(response.get('id'));
+                            console.log(mustHaves, wouldLike, ifCan);
                             renderViewModel(mustHaves, wouldLike, ifCan);
                         }
                     });
@@ -160,32 +167,32 @@
 
                     var id = itemEditor.getValue().id;
                     removedItem.url = removedItem.url + '/' + id;
-                    console.log(removedItem);
+                    //console.log(removedItem);
 
                     removedItem.destroy({
                         success: function () {
-                            console.log(id);
+                            //console.log(id);
                             var priority = itemEditor.getValue().priority;
                             if (priority === "Must Have"){
                                 for (var i = 0; i < mustHaves.length; i++){
                                     if (mustHaves[i].id === id){
-                                        mustHaves = mustHaves.splice(i, 1);
+                                        mustHaves.splice(Number(i), 1);
                                     }
                                 }
                             }else if (priority === "Would Be Nice To Have"){
                                 for (var i = 0; i < wouldLike.length; i++){
                                     if (wouldLike[i].id === id){
-                                        wouldLike = wouldLike.splice(i, 1);
+                                        wouldLike.splice(Number(i), 1);
                                     }
                                 }
                             }else{
                                 for (var i = 0; i < ifCan.length; i++){
                                     if (ifCan[i].id === id){
-                                        ifCan = ifCan.splice(i, 1);
+                                        ifCan.splice(Number(i), 1);
                                     }
                                 }
                             }
-                            //renderViewModel(mustHaves, wouldLike, ifCan);
+                            renderViewModel(mustHaves, wouldLike, ifCan);
                         }
                     });
                 });
@@ -200,7 +207,7 @@
                     var priority = itemEditor.getValue().priority;
 
                     updatedItem.set({id: id, title: title, url: url, price: price, priority: priority});
-                    console.log(updatedItem);
+                    //console.log(updatedItem);
                     if (id !== undefined){
                         updatedItem.save(null, {
                             type : 'PUT',

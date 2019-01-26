@@ -28,7 +28,7 @@ class Home extends REST_Controller
         $user = $this->User->getUserFromLogin($this->post('username'), $this->post('password'));
         if (isset($user)){
             $this->session->userLoggedIn = $user;
-            redirect('/List/Show', 'refresh');
+            redirect('/Home/List', 'refresh');
         }else{
             print json_encode("Wrong pass");
         }
@@ -104,7 +104,6 @@ class Home extends REST_Controller
             $this->load->view('Navigation/UserNavigation/header');
             //return View
             $this->load->view('List/Show');
-            //$this->load->view('Navigation/UserNavigation/footer');
         }else{
             //If no user, then redirect to login page
             redirect('/Home/Login', 'refresh');
