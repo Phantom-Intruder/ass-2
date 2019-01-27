@@ -12,29 +12,26 @@ class Home extends REST_Controller
         //Get user from session
         if (isset($this->session->wishListId)) {
             $this->load->view('Navigation/UserNavigation/header');
-            //return View
-            $this->load->model('User');
 
-            $wishListId = $this->session->wishListId;
-
-            $this->load->view('List/Show', array(
-                'wishListId' => $wishListId,
-            ));
+            $this->load->view('List/Show');
         }else{
-            //If no user, then redirect to login page
-            redirect('/Home/Login', 'refresh');
+            //If no user, then redirect to login page```
+            redirect('/Home/Login/Directed/1', 'refresh');
         }
     }
 
     /**
      * Shows login page to user if not logged in.
+     * @param int $directed
      */
-    public function login_get()
+    public function login_get($directed = 0)
     {
         $this->load->view('Navigation/UserNavigation/Header');
         //if user not logged in,
         if (!isset($this->session->wishListId)) {
-            $this->load->view('User/Login');
+            $this->load->view('User/Login', array(
+                'directed' => $directed,
+            ));
         }else{
             redirect('/Home/List', 'refresh');
         }
@@ -49,16 +46,16 @@ class Home extends REST_Controller
         $this->load->model('User');
         $user = $this->User->getUserFromLogin($this->post('username'), $this->post('password'));
         if (isset($user)){
-
+            //print_r($user);
             $this->load->model('WishList');
             $wishList = $this->WishList->getFromUserId($user['0']->id);
             $this->session->firstName = $user['0']->firstName;
             $this->session->wishListId = $wishList['0']->id;
             $data['loginValid'] = true;
-            print json_encode($data);
+            //print json_encode($data);
         }else{
             $data['loginValid'] = false;
-            print json_encode($data);
+            //print json_encode($data);
         }
     }
 
@@ -156,7 +153,7 @@ class Home extends REST_Controller
         foreach ($items as $item){
             $itemsList[] = array(
                 $item->title,
-                $item->url,
+                anchor($item->url, $item->url),
                 $item->price,
                 $item->priority,
             );

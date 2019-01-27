@@ -2,10 +2,9 @@
 
     <div id="object-list" class="panel-body"></div>
 
-<button class="btn btn-warning" id="getLink">Get shareable link</button>
+<button id="getLink">Get shareable link</button>
 <div id="shareable-link"></div>
 
-<!--php echo "<h5>Shareable link:</h5><a target='_blank' href= '". base_url()."index.php/Home/list_view/".html_escape($wishListId). "'>". base_url().'index.php/Home/list_view/'.html_escape($wishListId). "</a>"; ?>-->
 <script>
     var ShareableLink = Backbone.Model.extend({
         url: "<?= base_url().'index.php/Home/link'; ?>",
@@ -50,18 +49,18 @@
         },
         toString: function() {
             var attrs = this.attributes;
-            return '<br/><div style="border:1px solid black" class="container">' +
-                        '<div class="row" style="margin-left: 8px ">' +
-                            '<div class="col-sm"><strong> Title: </strong>'
+            return '<br/><div class="container">' +
+                        '<div class="data_container">' +
+                            '<div class="title"><strong> Title: </strong>'
                             + attrs.title +
                             '</div>' +
-                            '<div class="col-sm"><strong> URL: </strong>'
+                            '<div class="url"><strong> URL: </strong>'
                             + attrs.url +
                             '</div>' +
-                            '<div class="col-sm"><strong> Price: </strong>'
+                            '<div class="price"><strong> Price: </strong>'
                             + attrs.price+
                             '</div>' +
-                            '<div class="col-sm"><strong> Priority: </strong>'
+                            '<div class="priority"><strong> Priority: </strong>'
                             + attrs.priority+
                             '</div>' +
                         '</div>' +
@@ -140,33 +139,7 @@
                     addedItem.save(null, {
                         type : 'POST',
                         success: function (response) {
-                            if (response.get('priority') === 1){
-                                mustHaves.push({
-                                    id: response.get('id'),
-                                    title: response.get('title'),
-                                    url: response.get('url'),
-                                    price: response.get('price'),
-                                    priority: "Must Have"
-                                });
-                            }else if (response.get('priority') === 2){
-                                wouldLike.push({
-                                    id: response.get('id'),
-                                    title: response.get('title'),
-                                    url: response.get('url'),
-                                    price: response.get('price'),
-                                    priority: "Would Be Nice To Have"
-                                });
-                            }else if (response.get('priority') === 3){
-                                ifCan.push({
-                                    id: response.get('id'),
-                                    title: response.get('title'),
-                                    url: response.get('url'),
-                                    price: response.get('price'),
-                                    priority: "If You Can"
-                                });
-                            }
-                            //console.log(mustHaves, wouldLike, ifCan);
-                            renderViewModel(mustHaves, wouldLike, ifCan);
+                            addItems(response, mustHaves, wouldLike, ifCan);
                         }
                     });
                 });
@@ -182,26 +155,7 @@
                         success: function () {
                             //console.log(id);
                             var priority = itemEditor.getValue().priority;
-                            if (priority === "Must Have"){
-                                for (var i = 0; i < mustHaves.length; i++){
-                                    if (mustHaves[i].id === id){
-                                        mustHaves.splice(Number(i), 1);
-                                    }
-                                }
-                            }else if (priority === "Would Be Nice To Have"){
-                                for (var i = 0; i < wouldLike.length; i++){
-                                    if (wouldLike[i].id === id){
-                                        wouldLike.splice(Number(i), 1);
-                                    }
-                                }
-                            }else if (priority === "If You Can"){
-                                for (var i = 0; i < ifCan.length; i++){
-                                    if (ifCan[i].id === id){
-                                        ifCan.splice(Number(i), 1);
-                                    }
-                                }
-                            }
-                            renderViewModel(mustHaves, wouldLike, ifCan);
+                            removeItems(id, priority, mustHaves, wouldLike, ifCan)
                         }
                     });
                 });
@@ -217,67 +171,89 @@
 
                     updatedItem.set({id: id, title: title, url: url, price: price, priority: priority});
                     if ((id !== "") && (id !== undefined)){
-                        console.log(id);
+                        //console.log(id);
                         updatedItem.save(null, {
                             type : 'PUT',
                             success: function (response) {
-                                if (response.priority === 1){
-                                    for (var i = 0; i < mustHaves.length; i++){
-                                        if (mustHaves[i].id === id){
-                                            if (mustHaves[i].title !== title){
-                                                mustHaves[i].title = title;
-                                            }
-                                            if (mustHaves[i].url !== url){
-                                                mustHaves[i].url = url;
-                                            }
-                                            if (mustHaves[i].price !== price){
-                                                mustHaves[i].price = price;
-                                            }
-                                            if (mustHaves[i].priority !== priority){
-                                                mustHaves[i].priority = priority;
-                                            }
-                                        }
-                                    }
-                                }else if (response.priority === 2){
-                                    for (var i = 0; i < wouldLike.length; i++){
-                                        if (wouldLike[i].id === id){
-                                            if (wouldLike[i].title !== title){
-                                                wouldLike[i].title = title;
-                                            }
-                                            if (wouldLike[i].url !== url){
-                                                wouldLike[i].url = url;
-                                            }
-                                            if (wouldLike[i].price !== price){
-                                                wouldLike[i].price = price;
-                                            }
-                                            if (wouldLike[i].priority !== priority){
-                                                wouldLike[i].priority = priority;
-                                            }
-                                        }
-                                    }
-                                }else if (response.priority === 3){
-                                    for (var i = 0; i < ifCan.length; i++){
-                                        if (ifCan[i].id === id){
-                                            if (ifCan[i].title !== title){
-                                                ifCan[i].title = title;
-                                            }
-                                            if (ifCan[i].url !== url){
-                                                ifCan[i].url = url;
-                                            }
-                                            if (ifCan[i].price !== price){
-                                                ifCan[i].price = price;
-                                            }
-                                            if (ifCan[i].priority !== priority){
-                                                ifCan[i].priority = priority;
-                                            }
-                                        }
-                                    }
-                                }
-                                //renderViewModel(mustHaves, wouldLike, ifCan);
+                                console.log(itemEditor);
+                                removeItemFromAll(id, mustHaves, wouldLike, ifCan);
+                                addItems(response, mustHaves, wouldLike, ifCan);
                             }
                         });
                     }
                 });
+
+                function addItems(response, mustHaves, wouldLike, ifCan) {
+                    if (response.get('priority') === 1){
+                        mustHaves.push({
+                            id: response.get('id'),
+                            title: response.get('title'),
+                            url: response.get('url'),
+                            price: response.get('price'),
+                            priority: "Must Have"
+                        });
+                    }else if (response.get('priority') === 2){
+                        wouldLike.push({
+                            id: response.get('id'),
+                            title: response.get('title'),
+                            url: response.get('url'),
+                            price: response.get('price'),
+                            priority: "Would Be Nice To Have"
+                        });
+                    }else if (response.get('priority') === 3){
+                        ifCan.push({
+                            id: response.get('id'),
+                            title: response.get('title'),
+                            url: response.get('url'),
+                            price: response.get('price'),
+                            priority: "If You Can"
+                        });
+                    }
+                    //console.log(mustHaves, wouldLike, ifCan);
+                    renderViewModel(mustHaves, wouldLike, ifCan);
+                }
+                
+                function removeItems(id, priority, mustHaves, wouldLike, ifCan) {
+                    if (priority === "Must Have"){
+                        for (var i = 0; i < mustHaves.length; i++){
+                            if (mustHaves[i].id === id){
+                                mustHaves.splice(Number(i), 1);
+                            }
+                        }
+                    }else if (priority === "Would Be Nice To Have"){
+                        for (var i = 0; i < wouldLike.length; i++){
+                            if (wouldLike[i].id === id){
+                                wouldLike.splice(Number(i), 1);
+                            }
+                        }
+                    }else if (priority === "If You Can"){
+                        for (var i = 0; i < ifCan.length; i++){
+                            if (ifCan[i].id === id){
+                                ifCan.splice(Number(i), 1);
+                            }
+                        }
+                    }
+                    renderViewModel(mustHaves, wouldLike, ifCan);
+                }
+
+                function removeItemFromAll(id, mustHaves, wouldLike, ifCan) {
+                    for (var i = 0; i < mustHaves.length; i++){
+                        if (mustHaves[i].id == id){
+                            mustHaves.splice(Number(i), 1);
+                        }
+                    }
+                    for (var i = 0; i < wouldLike.length; i++){
+                        if (wouldLike[i].id == id){
+                            wouldLike.splice(Number(i), 1);
+                        }
+                    }
+                    for (var i = 0; i < ifCan.length; i++){
+                        if (ifCan[i].id == id){
+                            ifCan.splice(Number(i), 1);
+                        }
+                    }
+                    renderViewModel(mustHaves, wouldLike, ifCan);
+                }
             }
 
             renderViewModel(mustHaves, wouldLike, ifCan);
@@ -289,7 +265,7 @@
         shareableLink.fetch({
             success: function () {
             console.log(shareableLink.get('link'));
-            $('#shareable-link').append("<a target='_blank' href= '" + shareableLink.get('link') + "'>" + shareableLink.get('link') + "</a>");
+            $('#shareable-link').append("<textarea class='link_tag'>" + shareableLink.get('link') + "</textarea>");
         }});
     });
 </script>

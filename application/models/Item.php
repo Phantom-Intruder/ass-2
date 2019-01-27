@@ -81,7 +81,7 @@ class Item extends CI_Model {
      * Update item details
      */
     private function update(){
-        $this->db->update($this::DB_TABLE_NAME, $this, $this::DB_TABLE_PK_VALUE);
+        $this->db->replace($this::DB_TABLE_NAME, $this, $this::DB_TABLE_PK_VALUE);
         return $this->id;
     }
 

@@ -35,7 +35,9 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
         <meta name="description" content="<?php html_escape($menu_items[$menu_current]['desc']); ?>">
         <meta name="viewport" content="width=device-width">
 
-        <?= link_tag(base_url().'/css/bootstrap.min.css'); ?>
+        <?= link_tag(base_url().'css/bootstrap.min.css'); ?>
+        <?= link_tag(base_url().'css/bootstrap-responsive.min.css'); ?>
+        <?= link_tag(base_url().'css/main.css'); ?>
 
         <style>
             body {
@@ -43,17 +45,15 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
                 padding-bottom: 40px;
             }
         </style>
-        <?= link_tag(base_url().'/css/bootstrap-responsive.min.css'); ?>
-        <?= link_tag(base_url().'/css/main.css'); ?>
 
-        <script src=<?= base_url()."/js/vendor/modernizr-2.6.2.min.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/jquery-1.9.1.min.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/underscore-min.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/backbone-min.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/backbone-forms.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/list.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/backbone.bootstrap-modal.min.js"?>></script>
-        <script src=<?= base_url()."/js/vendor/bootstrap.min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/modernizr-2.6.2.min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/jquery-1.9.1.min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/underscore-min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/backbone-min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/backbone-forms.js"?>></script>
+        <script src=<?= base_url()."js/vendor/list.js"?>></script>
+        <script src=<?= base_url()."js/vendor/backbone.bootstrap-modal.min.js"?>></script>
+        <script src=<?= base_url()."js/vendor/bootstrap.min.js"?>></script>
     </head>
     <body>
         <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
