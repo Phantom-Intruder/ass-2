@@ -9,11 +9,7 @@ $menu_items = array(
   'logout' => array(
     'label' => 'Logout',
     'desc' => 'Unset user',
-  ),
-  'register' => array(
-    'label' => 'Register',
-    'desc' => 'Registration page',
-  ),
+  )
 );
 
 // Determine the current menu item.
@@ -72,17 +68,10 @@ if (@array_key_exists($this->uri->segment(2), $menu_items)) {
                                         echo '<a style="margin-left: 750px" href="' . base_url() . 'index.php/Home/' . $item . '" title="' . $item_data['desc'] . '">' . $item_data['label'] . '</a>';
                                         echo '</li>';
                                     }
-                                }else if($item_data['label'] == 'Register'){
-                                    if (!isset($this->session->wishListId)) {
-                                        echo '<li>';
-                                        echo '<a style="margin-left: 750px" href="' . base_url() . 'index.php/Home/' . $item . '" title="' . $item_data['desc'] . '">' . $item_data['label'] . '</a>';
-                                        echo '</li>';
-                                    }
                                 }else{
                                     echo '<li>';
                                     echo '<a href="' . base_url() . 'index.php/Home/' . $item . '" title="' . $item_data['desc'] . '">' . $item_data['label'] . '</a>';
                                     echo '</li>';
-
                                 }
                             }
                           ?>

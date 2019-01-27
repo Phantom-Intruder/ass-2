@@ -247,7 +247,7 @@ class Home extends REST_Controller
      */
     public function link_get(){
         header('Content-type: application/json');
-        $data['link'] = base_url()."index.php/Home/list_view/".html_escape($this->session->wishListId);
+        $data['link'] = base_url()."index.php/Home/Show/".html_escape($this->session->wishListId);
         print json_encode($data);
     }
 }

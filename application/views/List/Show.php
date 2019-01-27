@@ -54,8 +54,10 @@
                             '<div class="title"><strong> Title: </strong>'
                             + attrs.title +
                             '</div>' +
-                            '<div class="url"><strong> URL: </strong>'
-                            + attrs.url +
+                            '<div class="url"><strong> URL: </strong>' +
+                                '<a href="'+ attrs.url+'">'
+                                    + attrs.url +
+                                '</a>'+
                             '</div>' +
                             '<div class="price"><strong> Price: </strong>'
                             + attrs.price+
@@ -266,6 +268,7 @@
             success: function () {
             console.log(shareableLink.get('link'));
             $('#shareable-link').append("<textarea class='link_tag'>" + shareableLink.get('link') + "</textarea>");
+            $('#getLink').prop("disabled",true);;
         }});
     });
 </script>

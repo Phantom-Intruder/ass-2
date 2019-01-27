@@ -11,6 +11,7 @@
         <input type="submit" class="btn btn-info submit" />
     </form>
 </script>
+<p>Want to <a href="Login">Login</a> instead?</p>
 
 <script>
     $(function() {

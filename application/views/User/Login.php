@@ -13,6 +13,7 @@
         <input type="submit" class="btn btn-info submit" />
     </form>
 </script>
+<p>Want to <a href="Register">Register</a> instead?</p>
 
 <script>
     $(function() {

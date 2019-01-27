@@ -62,10 +62,24 @@ button {
     padding: 8px;
 }
 
-.link_tag{
-    color: hotpink;
+#getLink:disabled{
+    background-color: #777777;
+    cursor: not-allowed;
 }
 
+.link_tag{
+    color: hotpink;
+    width: 500px;
+    height: 20px;
+}
+
+.error{
+      background-color: rgb(242, 222, 222);
+}
+
+[data-error]{
+    color: #942a25;
+}
 
 
 
